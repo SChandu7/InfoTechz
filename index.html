@@ -790,7 +790,7 @@
         </div>
         <div class="stat-cell full">
           <div class="stat-num" style="font-size:1.2rem; color: var(--text-muted);">Guntur, Andhra Pradesh, India</div>
-          <div class="stat-label">Registered Business &middot; DUNS Verified</div>
+<div class="stat-label">Registered Business · Software Services</div>
         </div>
       </div>
     </div>
@@ -1038,17 +1038,63 @@
 </footer>
 
 <script>
-  document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const btn = this.querySelector('.form-submit');
-    btn.textContent = 'Sending…';
-    btn.disabled = true;
+  const CONTACT_API_URL =
+    "https://api.chandus7.in/api/contact/";
 
-    setTimeout(function() {
-      document.getElementById('contactForm').querySelector('.form-submit').hidden = true;
-      document.getElementById('form-success').hidden = false;
-    }, 800);
-  });
+  document
+    .getElementById("contactForm")
+    .addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const form = this;
+      const button = form.querySelector(".form-submit");
+      const success = document.getElementById("form-success");
+
+      const payload = {
+        first_name: document.getElementById("fname").value.trim(),
+        last_name: document.getElementById("lname").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        service: document.getElementById("service").value,
+        message: document.getElementById("message").value.trim()
+      };
+
+      button.disabled = true;
+      button.textContent = "Sending...";
+      success.hidden = true;
+
+      try {
+        const response = await fetch(CONTACT_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(
+            result.error || "Unable to submit your inquiry."
+          );
+        }
+
+        form.reset();
+        success.textContent =
+          "Thank you! Your inquiry has been received.";
+        success.hidden = false;
+
+      } catch (error) {
+        alert(
+          "Unable to send your inquiry. Please try again later."
+        );
+        console.error("Contact form error:", error);
+
+      } finally {
+        button.disabled = false;
+        button.textContent = "Send Inquiry";
+      }
+    });
 </script>
 
 </body></html>
